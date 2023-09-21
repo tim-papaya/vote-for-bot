@@ -14,6 +14,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:6.1.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8")
 }
 
 tasks.test {

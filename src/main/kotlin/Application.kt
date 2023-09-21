@@ -1,3 +1,4 @@
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.text
@@ -10,6 +11,8 @@ import kotlin.io.path.Path
 // 3 - next question
 
 fun main(args: Array<String>) {
+    val mapper = jacksonObjectMapper()
+
     val token = extractTokenFromFile(args[0])
     val bot = bot {
         this.token = token
