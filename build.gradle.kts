@@ -8,10 +8,12 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven ( url  = "https://jitpack.io" )
 }
 
 dependencies {
     testImplementation(kotlin("test"))
+    implementation("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:6.1.0")
 }
 
 tasks.test {
@@ -19,7 +21,7 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(8)
+    jvmToolchain(11)
 }
 
 application {
