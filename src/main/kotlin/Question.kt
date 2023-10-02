@@ -1,7 +1,8 @@
 class Question(
-    val id: Int,
-    val name: String,
+    val text: String,
+    val hasAnswers: Boolean,
     val answers: List<String>
 ) {
-
+    fun answersAsText() =
+        answers
 }
