@@ -7,7 +7,7 @@ enum class Character(val fullName: String) {
 }
 
 enum class State {
-    PICKING_CHARACTER, CHECK_MOOD, AT_SWAMP
+    PICKING_CHARACTER, CHECK_MOOD, AT_SWAMP, READY_FOR_FINAL_TEST
 }
 
 enum class Mood(val fullName: String) {
@@ -20,7 +20,8 @@ class GuestInfo(
     val chatId: Long,
     var state: State,
     var character: Character? = null,
-    var mood: Mood? = null
+    var mood: Mood? = null,
+    val answers: MutableMap<String, Answer> = HashMap()
 ) {
 
 }
