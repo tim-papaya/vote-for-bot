@@ -3,7 +3,14 @@ enum class Character(val fullName: String) {
     DRAGON("Дракониха"),
     CHARMING("Принц Чарминг"),
     DORIS("Дорис"),
-    WOLF("Волк")
+    WOLF("Большой и страшный серый волк"),
+    MICE_1("Слепая мышь I"),
+    MICE_2("Слепая мышь II"),
+    SHALTAY("Шалтай-Болтай"),
+    PINOCCHIO("Пинокио"),
+    PUSS_IN_BOOTS("Кот в сапогах"),
+    GINGY("Кот в сапогах"),
+    LORD_FARQUAAD("Лорд Фаркуад")
 }
 
 enum class State {

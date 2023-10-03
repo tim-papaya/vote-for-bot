@@ -32,7 +32,7 @@ fun loadBotState(questionsPath: String, guestsPath: String, photoPath: String): 
         mapper.readValue(File(questionsPath)),
         guests,
         guestsPath = guestsPath,
-        photoPath = photoPath
+        photoPath = photoPath + "\\"
     )
 }
 

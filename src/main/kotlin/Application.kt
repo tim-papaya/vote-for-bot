@@ -39,8 +39,20 @@ fun TextHandlerEnvironment.checkAdminCommand(botState: BotState) {
         }
 
         "#end" -> {
-            checkQuestionResultsWithAnswers(botState, adminChatId)
+            val question = botState.getCurrentQuestion()
+            if (question == null) {
+                sendMessage(adminChatId, "Вопрос не запущен")
+                return
+            }
+            if (question.hasAnswers)
+                checkQuestionResultsWithAnswers(botState, adminChatId)
+            else
+                checkQuestionResultsWithoutAnswers(botState, adminChatId,question)
             botState.setCurrentQuestion(null)
+        }
+
+        "#stats" -> {
+            getStatsForQuestionResultsWithAnswers(botState, adminChatId)
         }
     }
 }
@@ -57,7 +69,7 @@ private fun TextHandlerEnvironment.checkGuestCommand(botState: BotState) {
         PICKING_CHARACTER -> checkPickingCharacter(botState, chatId, text)
         CHECK_MOOD -> checkMood(botState, chatId, text)
         AT_SWAMP -> checkSwampCommands(botState, chatId, text)
-        READY_FOR_FINAL_TEST -> checkQuestionWithAnswers(botState, chatId, text)
+        READY_FOR_FINAL_TEST -> checkQuestion(botState, chatId, text)
     }
 
 }

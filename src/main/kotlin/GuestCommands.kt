@@ -3,7 +3,7 @@ import State.*
 import com.github.kotlintelegrambot.dispatcher.handlers.TextHandlerEnvironment
 import com.github.kotlintelegrambot.entities.ReplyKeyboardRemove
 
-fun TextHandlerEnvironment.checkQuestionWithAnswers(botState: BotState, chatId: Long, text: String) {
+fun TextHandlerEnvironment.checkQuestion(botState: BotState, chatId: Long, text: String) {
     val currentQuestion = botState.getCurrentQuestion()
     if (currentQuestion == null) {
         sendMessage(chatId, "Вопроса еще нет.")
@@ -12,25 +12,41 @@ fun TextHandlerEnvironment.checkQuestionWithAnswers(botState: BotState, chatId: 
 
     val guestInfo = botState.guests[chatId]!!
 
-    val answer = guestInfo.answers[currentQuestion.id]
+    if (currentQuestion.hasAnswers)
+        checkQuestionWithAnswer(currentQuestion, text, guestInfo, chatId)
+    else
+        checkQuestionWithoutAnswer(currentQuestion, text, guestInfo, chatId)
+}
 
-    if (answer != null) {
-        sendMessage(chatId, "Спасибо! Вы уже ответили.")
-        return
-    }
-
+private fun TextHandlerEnvironment.checkQuestionWithAnswer(
+    currentQuestion: Question,
+    text: String,
+    guestInfo: GuestInfo,
+    chatId: Long
+) {
     if (currentQuestion.answers.contains(text)) {
         guestInfo.answers[currentQuestion.id] = Answer(currentQuestion.id, currentQuestion.isRightAnswer(text), text)
-        sendMessage(chatId, "Ответ засчитан!", ReplyKeyboardRemove())
+        sendMessage(chatId, "Ответ засчитан!")
     } else {
         sendMessage(chatId, "Такого ответа нет")
         return
     }
 }
 
+private fun TextHandlerEnvironment.checkQuestionWithoutAnswer(
+    currentQuestion: Question,
+    text: String,
+    guestInfo: GuestInfo,
+    chatId: Long
+) {
+    guestInfo.answers[currentQuestion.id] = Answer(currentQuestion.id, false, text)
+    sendMessage(chatId, "Ответ засчитан!")
+}
+
 fun TextHandlerEnvironment.checkSwampCommands(botState: BotState, chatId: Long, text: String) {
     when (text) {
         "#ямыдюлок" -> {
+            sendPhoto(chatId, "${botState.photoPath}dulok.jpeg")
             sendMessage(
                 chatId,
                 "«Добро пожаловать в Дюлок! Вы готовы пройти тест с помощью Волшебных зеркал. Правила очень просты: на большом Волшебном зеркале и вашем карманном Волшебном зеркале вы увидите вопрос. Ваша задача в течение 30 секунд ответить на него. Вопросы подразумевают либо выбор варианта, либо свободный ответ».\n" +
@@ -55,14 +71,14 @@ fun TextHandlerEnvironment.checkMood(botState: BotState, chatId: Long, text: Str
                 this.mood = mood
                 state = AT_SWAMP
             }
+            sendPhoto(chatId, "${botState.photoPath}swamp.jpg")
             sendMessage(chatId, "Спасибо! Проходите на Болото", ReplyKeyboardRemove())
-            sendPhoto(chatId, createPhotoPath(botState, botState.guests[chatId]!!.character!!))
         }
     }
 }
 
 private fun createPhotoPath(botState: BotState, character: Character) =
-    botState.photoPath + "\\${character.name.lowercase()}.png"
+    botState.photoPath + "${character.name.lowercase()}.png"
 
 fun TextHandlerEnvironment.checkPickingCharacter(botState: BotState, chatId: Long, text: String) {
     Character.entries.firstOrNull { it.fullName == text.trim() }
@@ -72,6 +88,9 @@ fun TextHandlerEnvironment.checkPickingCharacter(botState: BotState, chatId: Lon
                 character = it
             }
         }?.also {
+            sendPhoto(chatId, createPhotoPath(botState, botState.guests[chatId]!!.character!!))
+            sendMessage(chatId, "Добро пожаловать ${it.fullName}!")
+
             sendMessage(
                 chatId, listOf(
                     "Спасибо за ответ! Скажите какое у вас настроение сегодня?",
