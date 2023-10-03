@@ -9,7 +9,7 @@ enum class Character(val fullName: String) {
     SHALTAY("Шалтай-Болтай"),
     PINOCCHIO("Пинокио"),
     PUSS_IN_BOOTS("Кот в сапогах"),
-    GINGY("Кот в сапогах"),
+    GINGY("Пряня"),
     LORD_FARQUAAD("Лорд Фаркуад")
 }
 
