@@ -56,32 +56,40 @@ fun TextHandlerEnvironment.checkMood(botState: BotState, chatId: Long, text: Str
                 state = AT_SWAMP
             }
             sendMessage(chatId, "Спасибо! Проходите на Болото", ReplyKeyboardRemove())
+            sendPhoto(chatId, createPhotoPath(botState, botState.guests[chatId]!!.character!!))
         }
     }
 }
 
+private fun createPhotoPath(botState: BotState, character: Character) =
+    botState.photoPath + "\\${character.name.lowercase()}.png"
+
 fun TextHandlerEnvironment.checkPickingCharacter(botState: BotState, chatId: Long, text: String) {
-    Character.entries.firstOrNull { it.fullName == text.trim() }?.also {
-        botState.guests[chatId]?.apply {
-            state = CHECK_MOOD
-            character = it
-        }
-    }?.also {
-        sendMessage(
-            chatId, listOf(
-                "Спасибо за ответ! Скажите какое у вас настроение сегодня?",
-                "1) Возбужденное (я хочу беситься/веселиться),",
-                "2) Мечтательное (я хочу покреативить),",
-                "3) Рассудительное (я хочу почиллить)"
-            ).joinToString("\n"),
-            replyMarkup = createMarkupWithMoods()
-        )
-    } ?: sendMessage(
+    Character.entries.firstOrNull { it.fullName == text.trim() }
+        .takeIf { notDuplicate(botState, text) }?.also {
+            botState.guests[chatId]?.apply {
+                state = CHECK_MOOD
+                character = it
+            }
+        }?.also {
+            sendMessage(
+                chatId, listOf(
+                    "Спасибо за ответ! Скажите какое у вас настроение сегодня?",
+                    "1) Возбужденное (я хочу беситься/веселиться),",
+                    "2) Мечтательное (я хочу покреативить),",
+                    "3) Рассудительное (я хочу почиллить)"
+                ).joinToString("\n"),
+                replyMarkup = createMarkupWithMoods()
+            )
+        } ?: sendMessage(
         chatId,
         "Ой, кажется вы выдаете себя за другого, попробуйте еще раз.",
         replyMarkup = createMarkupWithCharacters()
     )
 }
+
+private fun notDuplicate(botState: BotState, text: String) =
+    !botState.guests.map { (k, v) -> v.character?.fullName }.contains(text)
 
 fun TextHandlerEnvironment.checkWelcomeCommands(botState: BotState, chatId: Long) {
     when (text) {

@@ -10,7 +10,7 @@ import kotlin.io.path.Path
 
 fun main(args: Array<String>) {
     val token = extractTokenFromFile(args[0])
-    val botState = loadBotState(args[1], args[2])
+    val botState = loadBotState(args[1], args[2], args[3])
 
     bot {
         this.token = token

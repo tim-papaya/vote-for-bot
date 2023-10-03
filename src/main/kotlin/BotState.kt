@@ -8,6 +8,7 @@ class BotState(
     val guests: MutableMap<Long, GuestInfo>,
     private var currentQuestion: Question? = null,
     private val guestsPath: String,
+    val photoPath: String
 ) {
     fun getCurrentQuestion() = currentQuestion
 
@@ -23,7 +24,7 @@ class BotState(
 
 }
 
-fun loadBotState(questionsPath: String, guestsPath: String): BotState {
+fun loadBotState(questionsPath: String, guestsPath: String, photoPath: String): BotState {
     val mapper = jacksonObjectMapper()
     val guests = if (File(guestsPath).exists()) synchronizedMap<Long, GuestInfo>(mapper.readValue(File(guestsPath)))
     else synchronizedMap(mapOf())
@@ -31,6 +32,7 @@ fun loadBotState(questionsPath: String, guestsPath: String): BotState {
         mapper.readValue(File(questionsPath)),
         guests,
         guestsPath = guestsPath,
+        photoPath = photoPath
     )
 }
 
