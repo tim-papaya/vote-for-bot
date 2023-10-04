@@ -6,7 +6,9 @@ fun createMarkupWithCharacters(): KeyboardReplyMarkup {
     return KeyboardReplyMarkup(
         listOf(
             createCharactersLine(characters[0], characters[1], characters[2]),
-            createCharactersLine(characters[3], characters[4]),
+            createCharactersLine(characters[3], characters[4], characters[5]),
+            createCharactersLine(characters[6], characters[7], characters[8]),
+            createCharactersLine(characters[9], characters[10], characters[11]),
         )
     )
 }

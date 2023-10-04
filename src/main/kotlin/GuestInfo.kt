@@ -1,3 +1,16 @@
+// "Осел",
+// "Дракониха",
+// "Принц Чарминг",
+// "Дорис",
+// "Большой и страшный серый волк",
+// "Слепая мышь I",
+// "Слепая мышь II",
+// "Шалтай-Болтай",
+// "Пинокио",
+// "Кот в сапогах",
+// "Пряня",
+// "Лорд Фаркуад"
+
 enum class Character(val fullName: String) {
     DONKEY("Осел"),
     DRAGON("Дракониха"),
@@ -14,7 +27,7 @@ enum class Character(val fullName: String) {
 }
 
 enum class State {
-    PICKING_CHARACTER, CHECK_MOOD, AT_SWAMP, READY_FOR_FINAL_TEST
+    PICKING_CHARACTER, AT_SWAMP, CHECK_MOOD, CHARACTER_RECEIVED, READY_FOR_FINAL_TEST
 }
 
 enum class Mood(val fullName: String) {

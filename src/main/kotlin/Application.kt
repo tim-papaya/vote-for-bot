@@ -16,8 +16,8 @@ fun main(args: Array<String>) {
         this.token = token
         dispatch {
             text {
-                checkAdminCommand(botState)
-                checkGuestCommand(botState)
+                if (!checkAdminCommand(botState))
+                    checkGuestCommand(botState)
                 botState.save()
             }
         }
@@ -28,7 +28,7 @@ fun main(args: Array<String>) {
 
 }
 
-fun TextHandlerEnvironment.checkAdminCommand(botState: BotState) {
+fun TextHandlerEnvironment.checkAdminCommand(botState: BotState): Boolean {
     val adminChatId = message.chat.id
     val tokens = text.split(" ")
     val command = tokens[0]
@@ -36,26 +36,43 @@ fun TextHandlerEnvironment.checkAdminCommand(botState: BotState) {
     when (command) {
         "#question" -> {
             sendQuestionToQuests(botState, firstArgument)
+            return true
         }
 
         "#end" -> {
             val question = botState.getCurrentQuestion()
             if (question == null) {
                 sendMessage(adminChatId, "Вопрос не запущен")
-                return
+                return true
             }
-            if (question.hasAnswers)
-                checkQuestionResultsWithAnswers(botState, adminChatId)
-            else
-                checkQuestionResultsWithoutAnswers(botState, adminChatId,question)
+            if (question.hasRightAnswer()) {
+                checkQuestionResultsWithRightAnswer(botState, adminChatId)
+            } else {
+                checkQuestionResultsWithoutRightAnswer(botState, adminChatId, question)
+            }
+            botState.guests.filter { it.value.state == State.READY_FOR_FINAL_TEST }
+                .forEach { sendMessage(it.key, "Время вышло!") }
             botState.setCurrentQuestion(null)
+            return true
         }
 
         "#stats" -> {
-            getStatsForQuestionResultsWithAnswers(botState, adminChatId)
+            getStatsForQuestionResultsWithRightAnswer(botState, adminChatId)
+            return true
+        }
+        "#stats_open" -> {
+            getStatsForQuestionResultsWithoutAnswers(botState, adminChatId)
+            return true
+        }
+
+        "#moods" -> {
+            getMoods(botState, adminChatId)
+            return true
         }
     }
+    return false
 }
+
 
 private fun TextHandlerEnvironment.checkGuestCommand(botState: BotState) {
     val chatId = message.chat.id
@@ -67,8 +84,9 @@ private fun TextHandlerEnvironment.checkGuestCommand(botState: BotState) {
     when (botState.guests[chatId]?.state) {
         null -> checkWelcomeCommands(botState, chatId)
         PICKING_CHARACTER -> checkPickingCharacter(botState, chatId, text)
-        CHECK_MOOD -> checkMood(botState, chatId, text)
         AT_SWAMP -> checkSwampCommands(botState, chatId, text)
+        CHECK_MOOD -> checkMood(botState, chatId, text)
+        CHARACTER_RECEIVED -> checkCharacterReceivedCommands(botState, chatId, text)
         READY_FOR_FINAL_TEST -> checkQuestion(botState, chatId, text)
     }
 
