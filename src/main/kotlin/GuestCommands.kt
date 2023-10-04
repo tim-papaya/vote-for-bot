@@ -2,6 +2,8 @@ import Mood.*
 import State.*
 import com.github.kotlintelegrambot.dispatcher.handlers.TextHandlerEnvironment
 import com.github.kotlintelegrambot.entities.ReplyKeyboardRemove
+import java.nio.file.Files
+import java.nio.file.Path
 
 fun TextHandlerEnvironment.checkQuestion(botState: BotState, chatId: Long, text: String) {
     val currentQuestion = botState.getCurrentQuestion()
@@ -73,7 +75,12 @@ fun TextHandlerEnvironment.checkSwampCommands(botState: BotState, chatId: Long, 
     when (text) {
         "#погнали" -> {
             val character = botState.guests[chatId]!!.character!!
-            sendPhoto(chatId, createPhotoPath(botState, character))
+
+            val photoPath = createPhotoPath(botState, character)
+            if (Files.exists(Path.of(photoPath))) {
+                sendPhoto(chatId, photoPath)
+            }
+
             sendMessage(chatId, "Поздравляю вы ${character.fullName}")
 
             sendMessage(

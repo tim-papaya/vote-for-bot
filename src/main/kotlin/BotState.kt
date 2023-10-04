@@ -8,7 +8,8 @@ class BotState(
     val guests: MutableMap<Long, GuestInfo>,
     private var currentQuestion: Question? = null,
     private val guestsPath: String,
-    val photoPath: String
+    val photoPath: String,
+    val questionTimeLimit: Int = 30
 ) {
     fun getCurrentQuestion() = currentQuestion
 

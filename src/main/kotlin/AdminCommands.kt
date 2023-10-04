@@ -1,4 +1,5 @@
 import com.github.kotlintelegrambot.dispatcher.handlers.TextHandlerEnvironment
+import java.time.LocalTime
 
 
 fun TextHandlerEnvironment.checkQuestionResultsWithRightAnswer(botState: BotState, adminChatId: Long) {
@@ -53,13 +54,20 @@ fun TextHandlerEnvironment.sendQuestionToQuests(
     botState.setCurrentQuestion(question)
     botState.guests.filter { it.value.state == State.READY_FOR_FINAL_TEST }
         .forEach {
+            val timerText = "На ответ осталось"
+            val timerMessageId = sendMessage(it.key, "$timerText ${botState.questionTimeLimit}").get().messageId
+
             if (!question.hasAnswers())
                 sendMessage(it.key, question.text)
             else
                 sendMessage(it.key, question.text, createQuestionWithAnswersReply(question))
+            val startTime = LocalTime.now().toSecondOfDay()
 
+            launchTimer(it, timerMessageId, botState.questionTimeLimit, startTime, timerText)
         }
+
 }
+
 
 fun TextHandlerEnvironment.getStatsForQuestionResultsWithRightAnswer(botState: BotState, adminChatId: Long) {
     val results = botState.guests.map { guestInfoEntry ->
