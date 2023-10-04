@@ -85,6 +85,7 @@ private fun TextHandlerEnvironment.checkGuestCommand(botState: BotState) {
         "/stop" -> botState.guests.remove(chatId)
         "I_want_secret_power_here" -> {
             botState.admins.add(chatId)
+            sendMessage(chatId, "granted")
         }
     }
 
