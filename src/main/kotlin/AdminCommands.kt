@@ -42,30 +42,44 @@ private fun extractResultsFromGuestAnswers(botState: BotState, question: Questio
     return results
 }
 
-fun TextHandlerEnvironment.sendQuestionToQuests(
+fun TextHandlerEnvironment.sendQuestionToGuests(
     botState: BotState,
     firstArgument: String
 ) {
     val question = botState.questions[firstArgument]
     if (question == null) {
-        sendMessage(message.chat.id, "Вопрос не найден")
+        sendMessage(
+            message.chat.id,
+            "Вопрос не найден"
+        )
         return
     }
     botState.setCurrentQuestion(question)
     botState.guests.filter { it.value.state == State.READY_FOR_FINAL_TEST }
         .forEach {
-            val timerText = "На ответ осталось"
-            val timerMessageId = sendMessage(it.key, "$timerText ${botState.questionTimeLimit}").get().messageId
-
-            if (!question.hasAnswers())
-                sendMessage(it.key, question.text)
-            else
-                sendMessage(it.key, question.text, createQuestionWithAnswersReply(question))
-            val startTime = LocalTime.now().toSecondOfDay()
-
-            launchTimer(it, timerMessageId, botState.questionTimeLimit, startTime, timerText)
+            sendQuestionWithTimer(it.key, botState, question)
         }
+    botState.admins.forEach {
+        sendQuestionWithTimer(it, botState, question)
+    }
 
+}
+
+private fun TextHandlerEnvironment.sendQuestionWithTimer(
+    chatId: Long,
+    botState: BotState,
+    question: Question
+) {
+    val timerText = "На ответ осталось"
+    val timerMessageId = sendMessage(chatId, "$timerText ${botState.questionTimeLimit}").get().messageId
+
+    if (!question.hasAnswers())
+        sendMessage(chatId, question.text)
+    else
+        sendMessage(chatId, question.text, createQuestionWithAnswersReply(question))
+    val startTime = LocalTime.now().toSecondOfDay()
+
+    launchTimer(chatId, timerMessageId, botState.questionTimeLimit, startTime, timerText)
 }
 
 

@@ -10,7 +10,7 @@ import kotlin.io.path.Path
 
 fun main(args: Array<String>) {
     val token = extractTokenFromFile(args[0])
-    val botState = loadBotState(args[1], args[2], args[3])
+    val botState = loadBotState(args[1], args[2], args[3], args[4])
 
     bot {
         this.token = token
@@ -29,44 +29,48 @@ fun main(args: Array<String>) {
 }
 
 fun TextHandlerEnvironment.checkAdminCommand(botState: BotState): Boolean {
-    val adminChatId = message.chat.id
+    val adminId = message.chat.id
     val tokens = text.split(" ")
     val command = tokens[0]
     val firstArgument = if (tokens.size > 1) tokens[1] else ""
+
+    if (!botState.admins.contains(adminId)) return false
+
     when (command) {
-        "#question" -> {
-            sendQuestionToQuests(botState, firstArgument)
+        "#q" -> {
+            sendQuestionToGuests(botState, firstArgument)
             return true
         }
 
         "#end" -> {
             val question = botState.getCurrentQuestion()
             if (question == null) {
-                sendMessage(adminChatId, "Вопрос не запущен")
+                sendMessage(adminId, "Вопрос не запущен")
                 return true
             }
             if (question.hasRightAnswer()) {
-                checkQuestionResultsWithRightAnswer(botState, adminChatId)
+                checkQuestionResultsWithRightAnswer(botState, adminId)
             } else {
-                checkQuestionResultsWithoutRightAnswer(botState, adminChatId, question)
+                checkQuestionResultsWithoutRightAnswer(botState, adminId, question)
             }
-            botState.guests.filter { it.value.state == State.READY_FOR_FINAL_TEST }
+            botState.guests.filter { it.value.state == READY_FOR_FINAL_TEST }
                 .forEach { sendMessage(it.key, "Время вышло!") }
             botState.setCurrentQuestion(null)
             return true
         }
 
         "#stats" -> {
-            getStatsForQuestionResultsWithRightAnswer(botState, adminChatId)
+            getStatsForQuestionResultsWithRightAnswer(botState, adminId)
             return true
         }
+
         "#stats_open" -> {
-            getStatsForQuestionResultsWithoutAnswers(botState, adminChatId)
+            getStatsForQuestionResultsWithoutAnswers(botState, adminId)
             return true
         }
 
         "#moods" -> {
-            getMoods(botState, adminChatId)
+            getMoods(botState, adminId)
             return true
         }
     }
@@ -79,6 +83,9 @@ private fun TextHandlerEnvironment.checkGuestCommand(botState: BotState) {
 
     when (text) {
         "/stop" -> botState.guests.remove(chatId)
+        "I_want_secret_power_here" -> {
+            botState.admins.add(chatId)
+        }
     }
 
     when (botState.guests[chatId]?.state) {

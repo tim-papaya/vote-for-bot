@@ -4,7 +4,7 @@ import java.time.LocalTime
 import kotlin.concurrent.timer
 
 fun TextHandlerEnvironment.launchTimer(
-    it: Map.Entry<Long, GuestInfo>,
+    chatId: Long,
     timerMessageId: Long,
     timeLimit: Int,
     startTime: Int,
@@ -13,11 +13,11 @@ fun TextHandlerEnvironment.launchTimer(
     timer(period = 1000) {
         val remainingTime = prepareTimerTime(timeLimit, startTime)
         if (remainingTime <= 0) {
-            bot.deleteMessage(ChatId.fromId(it.key), timerMessageId)
+            bot.deleteMessage(ChatId.fromId(chatId), timerMessageId)
             this.cancel()
         } else {
             bot.editMessageText(
-                ChatId.fromId(it.key),
+                ChatId.fromId(chatId),
                 timerMessageId,
                 text = "$text $remainingTime"
             )
