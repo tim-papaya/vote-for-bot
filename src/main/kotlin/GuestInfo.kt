@@ -20,10 +20,12 @@ enum class Character(val fullName: String) {
     MICE_1("Слепая мышь I"),
     MICE_2("Слепая мышь II"),
     SHALTAY("Шалтай-Болтай"),
-    PINOCCHIO("Пинокио"),
+    PINOCCHIO("Пиноккио"),
     PUSS_IN_BOOTS("Кот в сапогах"),
     GINGY("Пряня"),
-    LORD_FARQUAAD("Лорд Фаркуад")
+    LORD_FARQUAAD("Лорд Фаркуад"),
+    FIONA("Фиона"),
+    SHREK("Шрек")
 }
 
 enum class State {
@@ -32,8 +34,7 @@ enum class State {
 
 enum class Mood(val fullName: String) {
     EXITING("Возбужденное"),
-    DREAMY("Мечтательное"),
-    CHILL("Рассудительное")
+    CHILL("Расслабленное")
 }
 
 class GuestInfo(

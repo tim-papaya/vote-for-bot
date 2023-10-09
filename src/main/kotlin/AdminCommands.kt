@@ -59,10 +59,10 @@ fun TextHandlerEnvironment.sendQuestionToGuests(
         .forEach {
             sendQuestionWithTimer(it.key, botState, question)
         }
-    botState.admins.forEach {
-        sendQuestionWithTimer(it, botState, question)
-    }
 
+    botState.admins
+        .filter { !botState.guests.contains(it) }
+        .forEach { sendQuestionWithTimer(it, botState, question) }
 }
 
 private fun TextHandlerEnvironment.sendQuestionWithTimer(
@@ -70,16 +70,17 @@ private fun TextHandlerEnvironment.sendQuestionWithTimer(
     botState: BotState,
     question: Question
 ) {
-    val timerText = "На ответ осталось"
-    val timerMessageId = sendMessage(chatId, "$timerText ${botState.questionTimeLimit}").get().messageId
-
     if (!question.hasAnswers())
         sendMessage(chatId, question.text)
     else
         sendMessage(chatId, question.text, createQuestionWithAnswersReply(question))
     val startTime = LocalTime.now().toSecondOfDay()
 
-    launchTimer(chatId, timerMessageId, botState.questionTimeLimit, startTime, timerText)
+    botState.admins.forEach {
+        val timerText = "На ответ осталось"
+        val timerMessageId = sendMessage(it, "$timerText ${botState.questionTimeLimit}").get().messageId
+        launchTimer(it, timerMessageId, botState.questionTimeLimit, startTime, timerText)
+    }
 }
 
 

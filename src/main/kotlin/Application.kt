@@ -37,12 +37,12 @@ fun TextHandlerEnvironment.checkAdminCommand(botState: BotState): Boolean {
     if (!botState.admins.contains(adminId)) return false
 
     when (command) {
-        "#q" -> {
+        "#question", "#q" -> {
             sendQuestionToGuests(botState, firstArgument)
             return true
         }
 
-        "#end" -> {
+        "#end", "#e" -> {
             val question = botState.getCurrentQuestion()
             if (question == null) {
                 sendMessage(adminId, "Вопрос не запущен")
@@ -59,17 +59,17 @@ fun TextHandlerEnvironment.checkAdminCommand(botState: BotState): Boolean {
             return true
         }
 
-        "#stats" -> {
+        "#stats", "#s" -> {
             getStatsForQuestionResultsWithRightAnswer(botState, adminId)
             return true
         }
 
-        "#stats_open" -> {
+        "#stats_open", "#se" -> {
             getStatsForQuestionResultsWithoutAnswers(botState, adminId)
             return true
         }
 
-        "#moods" -> {
+        "#moods", "#m" -> {
             getMoods(botState, adminId)
             return true
         }
@@ -82,7 +82,7 @@ private fun TextHandlerEnvironment.checkGuestCommand(botState: BotState) {
     val chatId = message.chat.id
 
     when (text) {
-        "/stop" -> botState.guests.remove(chatId)
+        "/stoppp" -> botState.guests.remove(chatId)
         "I_want_secret_power_here" -> {
             botState.admins.add(chatId)
             sendMessage(chatId, "granted")
@@ -92,8 +92,8 @@ private fun TextHandlerEnvironment.checkGuestCommand(botState: BotState) {
     when (botState.guests[chatId]?.state) {
         null -> checkWelcomeCommands(botState, chatId)
         PICKING_CHARACTER -> checkPickingCharacter(botState, chatId, text)
-        AT_SWAMP -> checkSwampCommands(botState, chatId, text)
         CHECK_MOOD -> checkMood(botState, chatId, text)
+        AT_SWAMP -> checkSwampCommands(botState, chatId, text)
         CHARACTER_RECEIVED -> checkCharacterReceivedCommands(botState, chatId, text)
         READY_FOR_FINAL_TEST -> checkQuestion(botState, chatId, text)
     }
